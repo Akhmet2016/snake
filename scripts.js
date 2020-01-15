@@ -6,9 +6,10 @@ const foodImg = new Image();
 
 ground.src = 'gameField.png';
 foodImg.src = 'food.png';
-let xSnake = 0;
 let box = 32;
 let score = 0;
+let leftCount = 0;
+let rightCount = 0;
 let food = {
     x: Math.floor(Math.random() * 17 + 1) * box,
     y: Math.floor(Math.random() * 15 + 3) * box
@@ -53,34 +54,17 @@ function eatTail(head, arr) {
     }
 }
 
-function drawGame(snakes) {
+function drawGame() {
     ctx.drawImage(ground, 0, 0);
     ctx.drawImage(foodImg, food.x, food.y);
 
+    for (let i = 0; i < snake.length; i++) {
+        ctx.fillStyle = i == 0 ? 'red' : 'green';
+        ctx.fillRect(snake[i].x, snake[i].y, box, box);
+    }
+
     let snakeX = snake[0].x;
     let snakeY = snake[0].y;
-
-    if (snakeX < box) {
-        console.log(snake);
-        for (let i = 0; i < snake.length; i++) {
-            snakes[i].x = snake[i].x + box * 17;
-            drawGame(snakes);
-        }
-    } else if (snakeX > box * 17) {
-        for (let i = 0; i < snake.length; i++) {
-            snakes[i].x = snake[i].x - box * 17;
-            drawGame(snakes);
-        }
-    } else if (snakeY < 3 * box  || snakeY > box * 17) {
-        console.dir(123);
-        clearInterval(game);
-        // document.getElementById('b').click();
-    } else {
-        for (let i = 0; i < snake.length; i++) {
-            ctx.fillStyle = i == 0 ? 'red' : 'green';
-            ctx.fillRect(snake[i].x, snake[i].y, box, box);
-        }
-    }
 
     ctx.fillStyle = 'white';
     ctx.font = '50px Arial';
@@ -107,6 +91,38 @@ function drawGame(snakes) {
     eatTail(newHead, snake);
 
     snake.unshift(newHead);
+
+    if (rightCount > 1 && rightCount < snake.length) {
+        snake[rightCount].x = snake[rightCount].x - box * 17;
+        rightCount++;
+
+    } else {
+        rightCount = 0;
+    }
+
+    if (leftCount > 1 && leftCount < snake.length) {
+        snake[leftCount].x = snake[leftCount].x + box * 17;
+        leftCount++;
+
+    } else {
+        leftCount = 0;
+    }
+
+    if (snakeX < box) {
+        if(leftCount != 1) {
+            snake[leftCount].x = snake[leftCount].x + box * 17;
+            leftCount++;
+        }
+    } else if (snakeX > box * 17) {
+        if(rightCount != 1) {
+            snake[rightCount].x = snake[rightCount].x - box * 17;
+            rightCount++;
+        }
+    } else if (snakeY < 3 * box  || snakeY > box * 17) {
+        clearInterval(game);
+        // document.getElementById('b').click();
+    }
+
 }
 
 let game = setInterval(drawGame, 150);
